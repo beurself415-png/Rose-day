@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Rose Day Surprise</title>
+
+<style>
+body{
+  margin:0;
+  font-family: Arial, sans-serif;
+  text-align:center;
+  background: linear-gradient(to right,#ff9a9e,#fad0c4);
+  overflow:hidden;
+}
+
+.container{
+  padding:50px;
+}
+
+button{
+  padding:12px 20px;
+  font-size:16px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  margin-top:20px;
+}
+
+input{
+  padding:10px;
+  font-size:18px;
+  text-align:center;
+}
+
+img{
+  width:250px;
+  border-radius:20px;
+  margin-top:20px;
+}
+
+canvas{
+  position:absolute;
+  top:0;
+  left:0;
+}
+
+@keyframes pulse{
+  from{ transform:translate(-50%,-50%) scale(1); }
+  to{ transform:translate(-50%,-50%) scale(1.1); }
+}
+</style>
+</head>
+
+<body>
+<div class="container" id="page"></div>
+
+<script>
+
+let page = document.getElementById("page");
+
+function show(content){
+  page.innerHTML = content;
+}
+
+function firstPage(){
+  show(`
+    <h2>Yenti ala chusthunnav 😏</h2>
+    <button onclick="secondPage()">sarle chudu 🫢</button>
+  `);
+}
+
+function secondPage(){
+  show(`
+    <h2>ee roju yento telsa 🫤</h2>
+    <button onclick="thirdPage()">click chey cheptha 🙂‍↔️</button>
+  `);
+}
+
+function thirdPage(){
+  show(`
+    <h2>Sarele kani oka question adagatha cheppu 🤐</h2>
+    <button onclick="questionPage()">OK</button>
+  `);
+}
+
+function questionPage(){
+  show(`
+    <h2>Nuvu nenu motham yenni roses exchange chesukunnamooo cheppuko chudham 🫣</h2>
+    <button onclick="forgot()">gurtuledhu 😬</button><br><br>
+    <input type="number" id="answer" placeholder="type here"><br>
+    <button onclick="checkAnswer()">Submit</button>
+  `);
+}
+
+function forgot(){
+  show(`
+    <h2>gurtu tecchukoni type chey bey buffaloowww 🤧</h2>
+    <input type="number" id="answer" placeholder="type here"><br>
+    <button onclick="checkAnswer()">Submit</button>
+  `);
+}
+
+function checkAnswer(){
+  let ans = document.getElementById("answer").value;
+  if(ans == 22){
+    correctPage();
+  }else{
+    alert("Wrong answer ra 😝 try again");
+  }
+}
+
+function correctPage(){
+  show(`
+    <h2>Yes correct answer 😚</h2>
+    <button onclick="lovePage()">I love you 😘</button>
+  `);
+}
+
+function lovePage(){
+  show(`
+    <img src="photo1.jpg">
+    <p>Idhi nuv naku icchina first flower 🌹🫶🏻</p>
+    <button onclick="photo2()">Inko photo chudham</button>
+  `);
+}
+
+function photo2(){
+  show(`
+    <img src="photo2.jpg">
+    <p>Idhi nuv last year icchina flower 🌹🥹</p>
+    <button onclick="countdown()">Click Here</button>
+  `);
+}
+
+function countdown(){
+  let count = 5;
+  show(`<h1 id="count">${count}</h1>`);
+  let interval = setInterval(()=>{
+    count--;
+    document.getElementById("count").innerText = count;
+    if(count==0){
+      clearInterval(interval);
+      finalPage();
+    }
+  },1000);
+}
+
+function finalPage(){
+  page.innerHTML = "";
+  document.body.style.background = "black";
+
+  const canvas = document.createElement("canvas");
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext("2d");
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const particles = [];
+  const heartPoints = [];
+  const sparkles = [];
+
+  function heartShape(t){
+    let x = 16 * Math.pow(Math.sin(t),3);
+    let y = -(13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t));
+    return {x:x, y:y};
+  }
+
+  for(let i=0;i<Math.PI*2;i+=0.08){
+    let point = heartShape(i);
+    heartPoints.push({
+      x: canvas.width/2 + point.x*18,
+      y: canvas.height/2 + point.y*18
+    });
+  }
+
+  heartPoints.forEach(pt=>{
+    particles.push({
+      x: Math.random()*canvas.width,
+      y: Math.random()*canvas.height,
+      targetX: pt.x,
+      targetY: pt.y,
+      size: 2 + Math.random()*2
+    });
+  });
+
+  function createSparkleBurst(){
+    for(let i=0;i<120;i++){
+      sparkles.push({
+        x: canvas.width/2,
+        y: canvas.height/2,
+        angle: Math.random()*Math.PI*2,
+        speed: 2 + Math.random()*4,
+        life: 100
+      });
+    }
+  }
+
+  function animate(){
+    ctx.fillStyle = "rgba(0,0,0,0.2)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    particles.forEach(p=>{
+      p.x += (p.targetX - p.x)*0.04;
+      p.y += (p.targetY - p.y)*0.04;
+
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+      ctx.fillStyle = "pink";
+      ctx.shadowBlur = 15;
+      ctx.shadowColor = "hotpink";
+      ctx.fill();
+    });
+
+    sparkles.forEach((s,index)=>{
+      s.x += Math.cos(s.angle)*s.speed;
+      s.y += Math.sin(s.angle)*s.speed;
+      s.life--;
+
+      ctx.beginPath();
+      ctx.arc(s.x,s.y,2,0,Math.PI*2);
+      ctx.fillStyle="white";
+      ctx.fill();
+
+      if(s.life<=0){
+        sparkles.splice(index,1);
+      }
+    });
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+
+  setTimeout(()=>{
+    createSparkleBurst();
+  },2500);
+
+  setTimeout(()=>{
+    const text = document.createElement("h1");
+    text.innerHTML="Happy Rose Day raaa husbanduuuuuuuuuuuu 🧿🌹🌹🌹🌹🫶🏻🫂🫀";
+    text.style.color="white";
+    text.style.position="absolute";
+    text.style.top="50%";
+    text.style.left="50%";
+    text.style.transform="translate(-50%,-50%)";
+    text.style.textAlign="center";
+    text.style.fontSize="32px";
+    text.style.animation="pulse 1s infinite alternate";
+    document.body.appendChild(text);
+  },3500);
+}
+
+firstPage();
+
+</script>
+</body>
+</html>
